@@ -18,6 +18,7 @@ func NewServer() *server.Server {
 		TextDocumentCompletion: textDocumentCompletion,
 		TextDocumentDidChange:  textDocumentDidChange,
 		TextDocumentDefinition: textDocumentDefinition,
+		TextDocumentCodeLens:   textDocumentCodeLens,
 	}
 
 	server := server.NewServer(&handler, "ruby-ti", false)
@@ -40,6 +41,10 @@ func initialize(
 			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
 			".", "_",
 		},
+	}
+
+	capabilities.CodeLensProvider = &protocol.CodeLensOptions{
+		ResolveProvider: &[]bool{false}[0],
 	}
 
 	syncKind := protocol.TextDocumentSyncKindFull
