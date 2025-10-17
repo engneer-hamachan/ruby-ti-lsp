@@ -14,6 +14,8 @@ export function activate(context: ExtensionContext) {
   const config = workspace.getConfiguration('rubyTiLsp');
   const serverPath = config.get<string>('serverPath', 'ti-lsp');
 
+  window.showInformationMessage(`Ruby-TI LSP: Starting server at ${serverPath}`);
+
   // Server options
   const serverOptions: ServerOptions = {
     command: serverPath,
@@ -42,9 +44,12 @@ export function activate(context: ExtensionContext) {
   );
 
   // Start the client (also starts the server)
-  client.start();
-
-  window.showInformationMessage('Ruby-TI LSP activated');
+  client.start().then(() => {
+    window.showInformationMessage('Ruby-TI LSP: Server started successfully');
+  }).catch((error) => {
+    window.showErrorMessage(`Ruby-TI LSP: Failed to start server: ${error.message}`);
+    console.error('Ruby-TI LSP error:', error);
+  });
 }
 
 export function deactivate(): Thenable<void> | undefined {
