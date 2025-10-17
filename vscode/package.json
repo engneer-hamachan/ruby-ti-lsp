@@ -1,0 +1,64 @@
+{
+  "name": "ruby-ti-lsp",
+  "displayName": "Ruby-TI LSP",
+  "description": "Ruby Language Server powered by Ruby-TI static type analyzer",
+  "version": "0.1.0",
+  "publisher": "ruby-ti",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:ruby"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "ruby",
+        "extensions": [
+          ".rb"
+        ]
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Ruby-TI LSP",
+      "properties": {
+        "rubyTiLsp.serverPath": {
+          "type": "string",
+          "default": "ti-lsp",
+          "description": "Path to the ti-lsp server executable"
+        },
+        "rubyTiLsp.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the language server"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.75.0",
+    "@vscode/vsce": "^2.22.0",
+    "typescript": "^5.3.0"
+  }
+}
