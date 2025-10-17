@@ -71,6 +71,10 @@ func textDocumentDidOpen(
 ) error {
 
 	documentContents[params.TextDocument.URI] = params.TextDocument.Text
+
+	// Run diagnostics on file open
+	go publishDiagnostics(ctx, params.TextDocument.URI, params.TextDocument.Text)
+
 	return nil
 }
 
@@ -96,6 +100,9 @@ func textDocumentDidChange(
 
 	if err := json.Unmarshal(changeEventBytes, &changeEvent); err == nil {
 		documentContents[params.TextDocument.URI] = changeEvent.Text
+
+		// Run diagnostics on file change
+		go publishDiagnostics(ctx, params.TextDocument.URI, changeEvent.Text)
 	}
 
 	return nil
@@ -136,5 +143,27 @@ func textDocumentDefinition(
 		return nil, nil
 	}
 
-	return findDefinition(content, params)
+	location, err := findDefinition(content, params)
+
+	return location, err
+}
+
+// publishDiagnostics runs ti command and publishes diagnostics
+func publishDiagnostics(ctx *glsp.Context, uri protocol.DocumentUri, content string) {
+	diagnostics := runDiagnostics(content)
+
+	ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, &protocol.PublishDiagnosticsParams{
+		URI:         uri,
+		Diagnostics: diagnostics,
+	})
+}
+
+// publishDiagnosticsFromErrors converts error strings to diagnostics and publishes them
+func publishDiagnosticsFromErrors(ctx *glsp.Context, uri protocol.DocumentUri, errors []string) {
+	diagnostics := parseErrorStrings(errors)
+
+	ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, &protocol.PublishDiagnosticsParams{
+		URI:         uri,
+		Diagnostics: diagnostics,
+	})
 }
