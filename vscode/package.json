@@ -12,7 +12,7 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "*"
+    "onLanguage:ruby"
   ],
   "main": "./out/extension.js",
   "contributes": {

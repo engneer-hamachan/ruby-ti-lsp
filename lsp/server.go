@@ -150,6 +150,13 @@ func textDocumentDefinition(
 
 // publishDiagnostics runs ti command and publishes diagnostics
 func publishDiagnostics(ctx *glsp.Context, uri protocol.DocumentUri, content string) {
+	// First, clear all previous diagnostics
+	ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, &protocol.PublishDiagnosticsParams{
+		URI:         uri,
+		Diagnostics: []protocol.Diagnostic{},
+	})
+
+	// Then run diagnostics and publish new results
 	diagnostics := runDiagnostics(content)
 
 	ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, &protocol.PublishDiagnosticsParams{
