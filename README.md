@@ -25,6 +25,9 @@ This project is currently in **beta** stage. Please do not use it in production 
 ## Installation
 
 ```fish
+git clone https://github.com/engneer-hamachan/ruby-ti-lsp
+cd ruby-ti-lsp
+
 # This will build the `ti-lsp` binary and install it to `./bin/ti-lsp`.
 make install
 ```
