@@ -120,7 +120,7 @@ func textDocumentCompletion(
 		return nil, nil
 	}
 
-	signatures := findComplection(content, params.Position.Line)
+	signatures := findComplection(content, params.Position.Line, params.Position.Character)
 
 	for _, sig := range signatures {
 		items =
