@@ -35,7 +35,7 @@ set -x PATH "/path/to/ruby-ti-lsp/bin:$PATH"
 
 #### Neovim
 
-Use your preferred LSP plugin. Example configuration for coc.nvim:
+Use your preferred LSP plugin. Example configuration for coc.nvim(coc-settings.json):
 
 ```json
 {
@@ -56,7 +56,7 @@ Use your preferred LSP plugin. Example configuration for coc.nvim:
 Install the VSCode extension:
 
 ```bash
-code --install-extension vscode/ruby-ti-lsp-0.1.0.vsix
+code --install-extension /path/to/vscode/ruby-ti-lsp-0.1.0.vsix
 ```
 
 ## Features

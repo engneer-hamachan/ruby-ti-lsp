@@ -23,10 +23,8 @@ func parseDefineInfo(line string) (*DefineInfo, error) {
 		return nil, nil
 	}
 
-	// Remove @ prefix
 	line = strings.TrimPrefix(line, "@")
 
-	// Split by separator ":::"
 	parts := strings.SplitN(line, ":::", 3)
 	if len(parts) != 3 {
 		return nil, nil
@@ -96,7 +94,6 @@ func findCodeLens(content string) ([]protocol.CodeLens, error) {
 	var lenses []protocol.CodeLens
 
 	for _, info := range infos {
-		// Convert 1-based row to 0-based for LSP
 		line := uint32(info.Row - 1)
 
 		lens := protocol.CodeLens{

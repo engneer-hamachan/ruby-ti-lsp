@@ -15,7 +15,6 @@ func removeTaiilDot(content string, line uint32, character uint32) string {
 	if int(line) < len(lines) {
 		currentLine := lines[line]
 
-		// Truncate line at cursor position to ignore characters after cursor
 		if int(character) <= len(currentLine) {
 			currentLine = currentLine[:character]
 		}
