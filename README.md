@@ -10,7 +10,8 @@ Ruby-TI LSP provides IDE features for Ruby code using the Ruby-TI type analyzer:
 - **Code Completion**: Auto-complete method suggestions based on type inference
 - **Go to Definition**: Jump to method and class definitions
 - **Diagnostics**: Real-time type error detection
-- **Type-aware Navigation**: Navigate using inheritance hierarchy
+
+![Example](images/sample.png)
 
 ## Requirements
 
@@ -20,6 +21,7 @@ Ruby-TI LSP provides IDE features for Ruby code using the Ruby-TI type analyzer:
 ## Installation
 
 ```fish
+# This will build the `ti-lsp` binary and install it to `./bin/ti-lsp`.
 make install
 ```
 
@@ -29,21 +31,7 @@ make install
 set -x PATH "/path/to/ruby-ti-lsp/bin:$PATH"
 ```
 
-This will build the `ti-lsp` binary and install it to `./bin/ti-lsp`.
-
 ## Usage
-
-### Command Line
-
-Run the LSP server:
-
-```bash
-./bin/ti-lsp
-```
-
-The server communicates via stdio and follows the LSP specification.
-
-### Editor Integration
 
 #### Neovim
 
@@ -77,7 +65,6 @@ code --install-extension vscode/ruby-ti-lsp-0.1.0.vsix
 
 Displays inferred type signatures inline at method definitions.
 
-![Code Lens](images/codelens.png)
 
 ### Code Completion
 
