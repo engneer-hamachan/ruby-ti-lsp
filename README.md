@@ -13,6 +13,10 @@ Ruby-TI LSP provides IDE features for Ruby code using the Ruby-TI type analyzer:
 
 ![Example](images/sample.png)
 
+## ⚠️ Beta Warning
+
+This project is currently in **beta** stage. Please do not use it in production environments. There may be bugs, incomplete features, or breaking changes in future releases.
+
 ## Requirements
 
 - Go 1.24.5 or later
@@ -56,7 +60,7 @@ Use your preferred LSP plugin. Example configuration for coc.nvim(coc-settings.j
 Install the VSCode extension:
 
 ```bash
-code --install-extension /path/to/vscode/ruby-ti-lsp-0.1.0.vsix
+code --install-extension /path/to/ruby-ti-lsp/vscode/ruby-ti-lsp-0.1.0.vsix
 ```
 
 ## Features
