@@ -83,7 +83,7 @@ func findComplection(content string, line uint32) []Sig {
 			"ti",
 			tmpFile.Name(),
 			"--suggest",
-			fmt.Sprintf("%d", line+1),
+			fmt.Sprintf("--row=%d", line+1),
 		)
 
 	output, err := cmd.Output()

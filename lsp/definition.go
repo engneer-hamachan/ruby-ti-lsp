@@ -215,7 +215,7 @@ func getTiOutForDefinition(
 	defer cancel()
 
 	cmd :=
-		exec.CommandContext(ctx, "ti", filename, "--define", fmt.Sprintf("%d", row))
+		exec.CommandContext(ctx, "ti", filename, "--define", fmt.Sprintf("--row=%d", row))
 
 	output, err := cmd.Output()
 	if err != nil {
