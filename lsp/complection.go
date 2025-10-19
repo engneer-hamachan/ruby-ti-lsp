@@ -40,7 +40,6 @@ func getSignatures(cmdOutput []byte) []Sig {
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		// Check for signature lines (prefixed with %)
 		if sigLine, ok := strings.CutPrefix(line, "%"); ok {
 			parts := strings.SplitN(sigLine, ":::", 2)
 			if len(parts) < 2 {

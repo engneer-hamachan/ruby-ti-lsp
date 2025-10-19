@@ -17,6 +17,7 @@ func NewServer() *server.Server {
 		TextDocumentDidOpen:    textDocumentDidOpen,
 		TextDocumentCompletion: textDocumentCompletion,
 		TextDocumentDidChange:  textDocumentDidChange,
+		TextDocumentDidSave:    textDocumentDidSave,
 		TextDocumentDefinition: textDocumentDefinition,
 		TextDocumentCodeLens:   textDocumentCodeLens,
 	}
@@ -106,6 +107,21 @@ func textDocumentDidChange(
 	return nil
 }
 
+func textDocumentDidSave(
+	ctx *glsp.Context,
+	params *protocol.DidSaveTextDocumentParams,
+) error {
+
+	content, ok := documentContents[params.TextDocument.URI]
+	if ok {
+		content = *params.Text
+	}
+
+	go publishDiagnostics(ctx, params.TextDocument.URI, content)
+
+	return nil
+}
+
 func textDocumentCompletion(
 	ctx *glsp.Context,
 	params *protocol.CompletionParams,
@@ -118,7 +134,8 @@ func textDocumentCompletion(
 		return nil, nil
 	}
 
-	signatures := findComplection(content, params.Position.Line, params.Position.Character)
+	signatures :=
+		findComplection(content, params.Position.Line, params.Position.Character)
 
 	for _, sig := range signatures {
 		items =
@@ -146,16 +163,27 @@ func textDocumentDefinition(
 	return location, err
 }
 
-func publishDiagnostics(ctx *glsp.Context, uri protocol.DocumentUri, content string) {
-	ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, &protocol.PublishDiagnosticsParams{
-		URI:         uri,
-		Diagnostics: []protocol.Diagnostic{},
-	})
+func publishDiagnostics(
+	ctx *glsp.Context,
+	uri protocol.DocumentUri,
+	content string,
+) {
+
+	ctx.Notify(
+		protocol.ServerTextDocumentPublishDiagnostics,
+		&protocol.PublishDiagnosticsParams{
+			URI:         uri,
+			Diagnostics: []protocol.Diagnostic{},
+		},
+	)
 
 	diagnostics := runDiagnostics(content)
 
-	ctx.Notify(protocol.ServerTextDocumentPublishDiagnostics, &protocol.PublishDiagnosticsParams{
-		URI:         uri,
-		Diagnostics: diagnostics,
-	})
+	ctx.Notify(
+		protocol.ServerTextDocumentPublishDiagnostics,
+		&protocol.PublishDiagnosticsParams{
+			URI:         uri,
+			Diagnostics: diagnostics,
+		},
+	)
 }

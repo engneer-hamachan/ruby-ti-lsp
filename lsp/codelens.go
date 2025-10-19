@@ -58,13 +58,13 @@ func getDefineInfos(content string) ([]DefineInfo, error) {
 		return nil, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5000*time.Millisecond)
+	ctx, cancel :=
+		context.WithTimeout(context.Background(), 1000*time.Millisecond)
+
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, "ti", tmpFile.Name(), "-i")
 	output, err := cmd.CombinedOutput()
-	// Don't return error if ti command fails - just return empty result
-	// This allows CodeLens to work even if there are syntax errors
 	if err != nil {
 		return []DefineInfo{}, nil
 	}
