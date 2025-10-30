@@ -1,11 +1,15 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
 	"os"
 	"os/exec"
 	"ruby-ti-lsp/lsp"
 )
+
+//go:embed .env
+var envContent string
 
 func main() {
 	if _, err := exec.LookPath("ti"); err != nil {
@@ -16,5 +20,6 @@ func main() {
 	}
 
 	server := lsp.NewServer()
+	lsp.SetEnvContent(envContent)
 	server.RunStdio()
 }
