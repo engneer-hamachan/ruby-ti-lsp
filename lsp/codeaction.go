@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -317,4 +318,47 @@ func findBuiltinConfigDir() string {
 	}
 
 	return ""
+}
+
+// checkAndRunMakeInstall checks if the saved file is in builtin_config and runs make install
+func checkAndRunMakeInstall(uri protocol.DocumentUri) {
+	// Convert URI to file path
+	filePath := strings.TrimPrefix(string(uri), "file://")
+
+	// Check if file is a JSON file
+	if !strings.HasSuffix(filePath, ".json") {
+		return
+	}
+
+	// Get builtin_config directory
+	configDir := findBuiltinConfigDir()
+	if configDir == "" {
+		return
+	}
+
+	// Check if the file is inside builtin_config directory
+	absFilePath, err := filepath.Abs(filePath)
+	if err != nil {
+		return
+	}
+
+	absConfigDir, err := filepath.Abs(configDir)
+	if err != nil {
+		return
+	}
+
+	// Check if file is in the config directory
+	if !strings.HasPrefix(absFilePath, absConfigDir) {
+		return
+	}
+
+	// Run make install in ruby-ti directory
+	rubyTiPath := getRubyTiPath()
+	if rubyTiPath == "" {
+		return
+	}
+
+	cmd := exec.Command("make", "install")
+	cmd.Dir = rubyTiPath
+	cmd.Run() // Ignore errors
 }

@@ -126,6 +126,9 @@ func textDocumentDidSave(
 
 	go publishDiagnostics(ctx, params.TextDocument.URI, content)
 
+	// Check if saved file is a builtin config JSON and run make install
+	go checkAndRunMakeInstall(params.TextDocument.URI)
+
 	return nil
 }
 
