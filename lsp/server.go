@@ -2,6 +2,7 @@ package lsp
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -143,8 +144,13 @@ func textDocumentCompletion(
 		return nil, nil
 	}
 
-	signatures :=
-		findComplection(content, params.Position.Line, params.Position.Character)
+	var signatures []Sig
+
+	if isJsonFile(params.TextDocument.URI) {
+		signatures = findJsonTypeCompletion(content, params.Position.Line, params.Position.Character)
+	} else {
+		signatures = findComplection(content, params.Position.Line, params.Position.Character)
+	}
 
 	for _, sig := range signatures {
 		items =
@@ -155,6 +161,10 @@ func textDocumentCompletion(
 	}
 
 	return items, nil
+}
+
+func isJsonFile(uri protocol.DocumentUri) bool {
+	return strings.HasSuffix(string(uri), ".json")
 }
 
 func textDocumentDefinition(

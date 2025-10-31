@@ -99,3 +99,79 @@ func findComplection(content string, line uint32, character uint32) []Sig {
 
 	return getSignatures(output)
 }
+
+func getAllTypes() []string {
+	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, "ti", "--all-type")
+	output, err := cmd.Output()
+	if err != nil {
+		return []string{}
+	}
+
+	var types []string
+	scanner := bufio.NewScanner(strings.NewReader(string(output)))
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line != "" {
+			types = append(types, line)
+		}
+	}
+
+	return types
+}
+
+func isInTypeArray(content string, line uint32, character uint32) bool {
+	lines := strings.Split(content, "\n")
+	if int(line) >= len(lines) {
+		return false
+	}
+
+	currentLine := lines[line]
+	if int(character) > len(currentLine) {
+		return false
+	}
+
+	beforeCursor := currentLine[:character]
+
+	quoteCount := strings.Count(beforeCursor, "\"")
+	if quoteCount%2 == 0 {
+		return false
+	}
+
+	for i := int(line); i >= 0 && i >= int(line)-10; i-- {
+		checkLine := strings.TrimSpace(lines[i])
+		if strings.Contains(checkLine, "\"type\"") || strings.Contains(checkLine, `"type":`) {
+			for j := i; j <= int(line); j++ {
+				l := strings.TrimSpace(lines[j])
+				if strings.HasPrefix(l, "]") && j < int(line) {
+					return false
+				}
+			}
+			return true
+		}
+		if strings.HasPrefix(checkLine, "}") || strings.HasPrefix(checkLine, "{") {
+			return false
+		}
+	}
+
+	return false
+}
+
+func findJsonTypeCompletion(content string, line uint32, character uint32) []Sig {
+	if !isInTypeArray(content, line, character) {
+		return []Sig{}
+	}
+
+	types := getAllTypes()
+	var signatures []Sig
+	for _, typeName := range types {
+		signatures = append(signatures, Sig{
+			Method: typeName,
+			Detail: "Type",
+		})
+	}
+
+	return signatures
+}
