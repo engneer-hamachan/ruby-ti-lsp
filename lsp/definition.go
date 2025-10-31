@@ -118,6 +118,28 @@ func findDefinition(
 
 	methodName := extractMethodName(targetCode, len(targetCode))
 
+	className := targetCode
+	if strings.Contains(targetCode, ".") {
+		// "JSON.parse" -> "JSON"
+		parts := strings.Split(targetCode, ".")
+		className = parts[0]
+	}
+
+	configDir := findBuiltinConfigDir()
+	if configDir != "" {
+		jsonPath := findBuiltinJsonPath(configDir, className)
+		if jsonPath != "" {
+			location := protocol.Location{
+				URI: protocol.DocumentUri("file://" + jsonPath),
+				Range: protocol.Range{
+					Start: protocol.Position{Line: 0, Character: 0},
+					End:   protocol.Position{Line: 0, Character: 0},
+				},
+			}
+			return location, nil
+		}
+	}
+
 	codeLines[params.Position.Line] = targetCode
 	modifiedContent := strings.Join(codeLines, "\n")
 

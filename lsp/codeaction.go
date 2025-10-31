@@ -313,6 +313,14 @@ func findBuiltinConfigDir() string {
 	return ""
 }
 
+func findBuiltinJsonPath(configDir string, className string) string {
+	jsonPath := fmt.Sprintf("%s/%s.json", configDir, strings.ToLower(className))
+	if _, err := os.Stat(jsonPath); err == nil {
+		return jsonPath
+	}
+	return ""
+}
+
 func checkAndRunMakeInstall(uri protocol.DocumentUri) {
 	filePath := strings.TrimPrefix(string(uri), "file://")
 
