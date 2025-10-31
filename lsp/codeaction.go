@@ -15,12 +15,10 @@ import (
 
 var envContent string
 
-// SetEnvContent sets the embedded .env content
 func SetEnvContent(content string) {
 	envContent = content
 }
 
-// TiClassConfig represents the JSON structure for ti builtin config
 type TiClassConfig struct {
 	Frame           string     `json:"frame"`
 	Class           string     `json:"class"`
@@ -41,18 +39,17 @@ type TiArgument struct {
 }
 
 type TiReturnType struct {
-	Type            []string `json:"type"`
-	IsConditional   bool     `json:"is_conditional,omitempty"`
-	IsDestructive   bool     `json:"is_destructive,omitempty"`
+	Type          []string `json:"type"`
+	IsConditional bool     `json:"is_conditional,omitempty"`
+	IsDestructive bool     `json:"is_destructive,omitempty"`
 }
 
-// ErrorInfo contains parsed error information from ti diagnostics
 type ErrorInfo struct {
 	Line         uint32
-	ErrorType    string // "class" or "method"
+	ErrorType    string
 	ClassName    string
 	MethodName   string
-	MethodType   string // "instance" or "class"
+	MethodType   string
 	ErrorMessage string
 }
 
@@ -62,21 +59,24 @@ func textDocumentCodeAction(
 ) (any, error) {
 	var codeActions []protocol.CodeAction
 
-	// Parse diagnostics to find errors
 	for _, diagnostic := range params.Context.Diagnostics {
 		errorInfo := parseErrorMessage(diagnostic.Message, diagnostic.Range.Start.Line)
 		if errorInfo == nil {
 			continue
 		}
 
-		// Create appropriate code action based on error type
-		if errorInfo.ErrorType == "class" {
-			action := createClassCodeAction(errorInfo, params.TextDocument.URI, diagnostic)
+		switch errorInfo.ErrorType {
+		case "class":
+			action :=
+				createClassCodeAction(errorInfo, diagnostic)
+
 			if action != nil {
 				codeActions = append(codeActions, *action)
 			}
-		} else if errorInfo.ErrorType == "method" {
-			action := createMethodCodeAction(errorInfo, params.TextDocument.URI, diagnostic)
+
+		case "method":
+			action :=
+				createMethodCodeAction(errorInfo, params.TextDocument.URI, diagnostic)
 			if action != nil {
 				codeActions = append(codeActions, *action)
 			}
@@ -86,10 +86,10 @@ func textDocumentCodeAction(
 	return codeActions, nil
 }
 
-// parseErrorMessage parses ti error messages to extract error information
 func parseErrorMessage(message string, line uint32) *ErrorInfo {
-	// Pattern: class 'Hoge' is not defined
-	classPattern := regexp.MustCompile(`class '([^']+)' is not defined`)
+	classPattern :=
+		regexp.MustCompile(`class '([^']+)' is not defined`)
+
 	if matches := classPattern.FindStringSubmatch(message); len(matches) > 1 {
 		return &ErrorInfo{
 			Line:         line,
@@ -99,8 +99,9 @@ func parseErrorMessage(message string, line uint32) *ErrorInfo {
 		}
 	}
 
-	// Pattern: instance method 'xxx' is not defined for Test
-	instanceMethodPattern := regexp.MustCompile(`instance method '([^']+)' is not defined for ([^\s]+)`)
+	instanceMethodPattern :=
+		regexp.MustCompile(`instance method '([^']+)' is not defined for ([^\s]+)`)
+
 	if matches := instanceMethodPattern.FindStringSubmatch(message); len(matches) > 2 {
 		return &ErrorInfo{
 			Line:         line,
@@ -112,8 +113,9 @@ func parseErrorMessage(message string, line uint32) *ErrorInfo {
 		}
 	}
 
-	// Pattern: class method 'xxx' is not defined for Test
-	classMethodPattern := regexp.MustCompile(`class method '([^']+)' is not defined for ([^\s]+)`)
+	classMethodPattern :=
+		regexp.MustCompile(`class method '([^']+)' is not defined for ([^\s]+)`)
+
 	if matches := classMethodPattern.FindStringSubmatch(message); len(matches) > 2 {
 		return &ErrorInfo{
 			Line:         line,
@@ -128,15 +130,12 @@ func parseErrorMessage(message string, line uint32) *ErrorInfo {
 	return nil
 }
 
-// createClassCodeAction creates a code action to generate a new class JSON file
 func createClassCodeAction(
 	errorInfo *ErrorInfo,
-	uri protocol.DocumentUri,
 	diagnostic protocol.Diagnostic,
 ) *protocol.CodeAction {
 	title := fmt.Sprintf("Create class definition for '%s'", errorInfo.ClassName)
 
-	// Find ruby-ti builtin_config directory
 	configDir := findBuiltinConfigDir()
 	if configDir == "" {
 		return nil
@@ -166,7 +165,6 @@ func createClassCodeAction(
 		return nil
 	}
 
-	// Create workspace edit to write the file
 	changes := make(map[protocol.DocumentUri][]protocol.TextEdit)
 	fileUri := protocol.DocumentUri("file://" + filePath)
 
@@ -194,28 +192,31 @@ func createClassCodeAction(
 	}
 }
 
-// createMethodCodeAction creates a code action to add a method to existing class JSON
 func createMethodCodeAction(
 	errorInfo *ErrorInfo,
 	uri protocol.DocumentUri,
 	diagnostic protocol.Diagnostic,
 ) *protocol.CodeAction {
-	title := fmt.Sprintf("Add method '%s' to class '%s'", errorInfo.MethodName, errorInfo.ClassName)
 
-	// Find ruby-ti builtin_config directory
+	title :=
+		fmt.Sprintf(
+			"Add method '%s' to class '%s'",
+			errorInfo.MethodName,
+			errorInfo.ClassName,
+		)
+
 	configDir := findBuiltinConfigDir()
 	if configDir == "" {
 		return nil
 	}
 
-	filePath := filepath.Join(configDir, strings.ToLower(errorInfo.ClassName)+".json")
+	filePath :=
+		filepath.Join(configDir, strings.ToLower(errorInfo.ClassName)+".json")
 
-	// Check if file exists
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return nil
 	}
 
-	// Read existing config
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil
@@ -226,7 +227,6 @@ func createMethodCodeAction(
 		return nil
 	}
 
-	// Add new method with proper structure
 	newMethod := TiMethod{
 		Name: errorInfo.MethodName,
 		Arguments: []TiArgument{
@@ -237,24 +237,20 @@ func createMethodCodeAction(
 		},
 	}
 
-	// Add to appropriate method list based on method type
 	if errorInfo.MethodType == "class" {
 		classConfig.ClassMethods = append(classConfig.ClassMethods, newMethod)
 	} else {
 		classConfig.InstanceMethods = append(classConfig.InstanceMethods, newMethod)
 	}
 
-	// Marshal back to JSON
 	jsonData, err := json.MarshalIndent(classConfig, "", "  ")
 	if err != nil {
 		return nil
 	}
 
-	// Create workspace edit
 	changes := make(map[protocol.DocumentUri][]protocol.TextEdit)
 	fileUri := protocol.DocumentUri("file://" + filePath)
 
-	// Read file to get line count
 	lines := strings.Split(string(data), "\n")
 	lastLine := uint32(len(lines))
 
@@ -282,20 +278,18 @@ func createMethodCodeAction(
 	}
 }
 
-// getRubyTiPath reads RUBY_TI_PATH from embedded .env file
 func getRubyTiPath() string {
 	lines := strings.Split(envContent, "\n")
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
-		// Skip comments and empty lines
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
-		// Parse RUBY_TI_PATH=value
+
 		if strings.HasPrefix(line, "RUBY_TI_PATH=") {
 			path := strings.TrimPrefix(line, "RUBY_TI_PATH=")
 			path = strings.TrimSpace(path)
-			// Remove quotes if present
+
 			path = strings.Trim(path, "\"'")
 			if path != "" {
 				return path
@@ -305,7 +299,6 @@ func getRubyTiPath() string {
 	return ""
 }
 
-// findBuiltinConfigDir attempts to find the ruby-ti builtin_config directory
 func findBuiltinConfigDir() string {
 	rubyTiPath := getRubyTiPath()
 	if rubyTiPath == "" {
@@ -320,23 +313,18 @@ func findBuiltinConfigDir() string {
 	return ""
 }
 
-// checkAndRunMakeInstall checks if the saved file is in builtin_config and runs make install
 func checkAndRunMakeInstall(uri protocol.DocumentUri) {
-	// Convert URI to file path
 	filePath := strings.TrimPrefix(string(uri), "file://")
 
-	// Check if file is a JSON file
 	if !strings.HasSuffix(filePath, ".json") {
 		return
 	}
 
-	// Get builtin_config directory
 	configDir := findBuiltinConfigDir()
 	if configDir == "" {
 		return
 	}
 
-	// Check if the file is inside builtin_config directory
 	absFilePath, err := filepath.Abs(filePath)
 	if err != nil {
 		return
@@ -347,12 +335,10 @@ func checkAndRunMakeInstall(uri protocol.DocumentUri) {
 		return
 	}
 
-	// Check if file is in the config directory
 	if !strings.HasPrefix(absFilePath, absConfigDir) {
 		return
 	}
 
-	// Run make install in ruby-ti directory
 	rubyTiPath := getRubyTiPath()
 	if rubyTiPath == "" {
 		return
@@ -360,5 +346,5 @@ func checkAndRunMakeInstall(uri protocol.DocumentUri) {
 
 	cmd := exec.Command("make", "install")
 	cmd.Dir = rubyTiPath
-	cmd.Run() // Ignore errors
+	cmd.Run()
 }
