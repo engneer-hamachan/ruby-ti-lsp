@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -250,25 +249,26 @@ func createMethodCodeAction(
 		return nil
 	}
 
-	// Write file directly
-	if err := os.WriteFile(filePath, []byte(string(jsonData)+"\n"), 0644); err != nil {
-		return nil
-	}
-
-	// Run make install in ruby-ti directory
-	rubyTiPath := getRubyTiPath()
-	if rubyTiPath != "" {
-		cmd := exec.Command("make", "install")
-		cmd.Dir = rubyTiPath
-		cmd.Run() // Ignore errors for now
-	}
-
-	// Create workspace edit to open the file
+	// Create workspace edit
+	changes := make(map[protocol.DocumentUri][]protocol.TextEdit)
 	fileUri := protocol.DocumentUri("file://" + filePath)
-	command := &protocol.Command{
-		Title:     "Open file",
-		Command:   "vscode.open",
-		Arguments: []any{fileUri},
+
+	// Read file to get line count
+	lines := strings.Split(string(data), "\n")
+	lastLine := uint32(len(lines))
+
+	changes[fileUri] = []protocol.TextEdit{
+		{
+			Range: protocol.Range{
+				Start: protocol.Position{Line: 0, Character: 0},
+				End:   protocol.Position{Line: lastLine, Character: 0},
+			},
+			NewText: string(jsonData) + "\n",
+		},
+	}
+
+	edit := protocol.WorkspaceEdit{
+		Changes: changes,
 	}
 
 	kind := protocol.CodeActionKindQuickFix
@@ -277,7 +277,7 @@ func createMethodCodeAction(
 		Title:       title,
 		Kind:        &kind,
 		Diagnostics: []protocol.Diagnostic{diagnostic},
-		Command:     command,
+		Edit:        &edit,
 	}
 }
 

@@ -1,3 +1,3 @@
-a = Array.new
+Aaa
 
 Array.aaaaa
