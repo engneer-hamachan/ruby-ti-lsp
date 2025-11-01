@@ -57,10 +57,13 @@ func textDocumentCodeAction(
 	ctx *glsp.Context,
 	params *protocol.CodeActionParams,
 ) (any, error) {
+
 	var codeActions []protocol.CodeAction
 
 	for _, diagnostic := range params.Context.Diagnostics {
-		errorInfo := parseErrorMessage(diagnostic.Message, diagnostic.Range.Start.Line)
+		errorInfo :=
+			parseErrorMessage(diagnostic.Message, diagnostic.Range.Start.Line)
+
 		if errorInfo == nil {
 			continue
 		}
@@ -75,8 +78,7 @@ func textDocumentCodeAction(
 			}
 
 		case "method":
-			action :=
-				createMethodCodeAction(errorInfo, params.TextDocument.URI, diagnostic)
+			action := createMethodCodeAction(errorInfo, diagnostic)
 			if action != nil {
 				codeActions = append(codeActions, *action)
 			}
@@ -90,7 +92,9 @@ func parseErrorMessage(message string, line uint32) *ErrorInfo {
 	classPattern :=
 		regexp.MustCompile(`class '([^']+)' is not defined`)
 
-	if matches := classPattern.FindStringSubmatch(message); len(matches) > 1 {
+	matches := classPattern.FindStringSubmatch(message)
+
+	if len(matches) > 1 {
 		return &ErrorInfo{
 			Line:         line,
 			ErrorType:    "class",
@@ -102,7 +106,9 @@ func parseErrorMessage(message string, line uint32) *ErrorInfo {
 	instanceMethodPattern :=
 		regexp.MustCompile(`instance method '([^']+)' is not defined for ([^\s]+)`)
 
-	if matches := instanceMethodPattern.FindStringSubmatch(message); len(matches) > 2 {
+	matches = instanceMethodPattern.FindStringSubmatch(message)
+
+	if len(matches) > 2 {
 		return &ErrorInfo{
 			Line:         line,
 			ErrorType:    "method",
@@ -116,7 +122,9 @@ func parseErrorMessage(message string, line uint32) *ErrorInfo {
 	classMethodPattern :=
 		regexp.MustCompile(`class method '([^']+)' is not defined for ([^\s]+)`)
 
-	if matches := classMethodPattern.FindStringSubmatch(message); len(matches) > 2 {
+	matches = classMethodPattern.FindStringSubmatch(message)
+
+	if len(matches) > 2 {
 		return &ErrorInfo{
 			Line:         line,
 			ErrorType:    "method",
@@ -134,6 +142,7 @@ func createClassCodeAction(
 	errorInfo *ErrorInfo,
 	diagnostic protocol.Diagnostic,
 ) *protocol.CodeAction {
+
 	title := fmt.Sprintf("Create class definition for '%s'", errorInfo.ClassName)
 
 	configDir := findBuiltinConfigDir()
@@ -141,9 +150,9 @@ func createClassCodeAction(
 		return nil
 	}
 
-	filePath := filepath.Join(configDir, strings.ToLower(errorInfo.ClassName)+".json")
+	filePath :=
+		filepath.Join(configDir, strings.ToLower(errorInfo.ClassName)+".json")
 
-	// Create new class config with proper structure
 	classConfig := TiClassConfig{
 		Frame:           "Builtin",
 		Class:           errorInfo.ClassName,
@@ -194,7 +203,6 @@ func createClassCodeAction(
 
 func createMethodCodeAction(
 	errorInfo *ErrorInfo,
-	uri protocol.DocumentUri,
 	diagnostic protocol.Diagnostic,
 ) *protocol.CodeAction {
 
@@ -279,15 +287,16 @@ func createMethodCodeAction(
 }
 
 func getRubyTiPath() string {
-	lines := strings.Split(envContent, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(envContent, "\n")
+
+	for line := range lines {
 		line = strings.TrimSpace(line)
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
 
-		if strings.HasPrefix(line, "RUBY_TI_PATH=") {
-			path := strings.TrimPrefix(line, "RUBY_TI_PATH=")
+		path, ok := strings.CutPrefix(line, "RUBY_TI_PATH=")
+		if ok {
 			path = strings.TrimSpace(path)
 
 			path = strings.Trim(path, "\"'")
