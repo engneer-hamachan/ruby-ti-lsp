@@ -159,6 +159,62 @@ func isInTypeArray(content string, line uint32, character uint32) bool {
 	return false
 }
 
+func makeTypeDetail(typeName string) string {
+	typeDescriptions := map[string]string{
+		// Basic types
+		"Int":    "Integer type - represents whole numbers",
+		"Float":  "Float type - represents decimal numbers",
+		"String": "String type - represents text",
+		"Bool":   "Boolean type - true or false",
+		"Nil":    "Nil type - represents absence of value",
+		"Symbol": "Symbol type - immutable identifier",
+
+		// Container types
+		"Array":       "Array type - collection of elements",
+		"Hash":        "Hash type - key-value mapping",
+		"IntArray":    "Array of integers - specialized array containing only Int elements",
+		"FloatArray":  "Array of floats - specialized array containing only Float elements",
+		"StringArray": "Array of strings - specialized array containing only String elements",
+
+		// Default types (used when type cannot be inferred)
+		"DefaultInt":     "Default integer - fallback type when Int inference fails",
+		"DefaultFloat":   "Default float - fallback type when Float inference fails",
+		"DefaultString":  "Default string - fallback type when String inference fails",
+		"DefaultBlock":   "Default block - fallback type when Block inference fails",
+		"DefaultUntyped": "Default untyped - fallback when no type can be inferred",
+
+		// Block and functional types
+		"Block":            "Block type - represents a code block/lambda",
+		"BlockResultArray": "Array of block results - array containing elements returned by block execution",
+		"KeyValueArray":    "Array of key-value pairs - array created from hash entries",
+		"KeyArray":         "Array of keys - array containing hash keys",
+
+		// Special type system types
+		"Untyped":             "Untyped - represents values without type constraints",
+		"Unify":               "Unify variants - combines multiple type variants into one unified type",
+		"OptionalUnify":       "Optional unify - unifies variants and adds Nil as possible type",
+		"SelfConvertArray":    "Self converted to array - converts receiver object into array of its variants",
+		"SelfArgument":        "Self argument - returns Nil, single arg, or array based on argument count",
+		"UnifiedSelfArgument": "Unified self argument - unified version of self argument type",
+		"Flatten":             "Flatten - flattens nested structures into single level",
+
+		// Union and special
+		"Number":  "Number type - union of Int and Float",
+		"Union":   "Union type - represents multiple possible types",
+		"Self":    "Self type - refers to the receiver objects type",
+		"Range":   "Range type - represents a range of values",
+		"Keyword": "Keyword argument - named parameter in method call",
+
+		// Test/other
+		"IntInt": "Int or Int union - used for testing union types",
+	}
+
+	if desc, ok := typeDescriptions[typeName]; ok {
+		return desc
+	}
+	return typeName
+}
+
 func findJsonTypeCompletion(content string, line uint32, character uint32) []Sig {
 	if !isInTypeArray(content, line, character) {
 		return []Sig{}
@@ -167,9 +223,13 @@ func findJsonTypeCompletion(content string, line uint32, character uint32) []Sig
 	types := getAllTypes()
 	var signatures []Sig
 	for _, typeName := range types {
+		if typeName == "IntInt" {
+			continue
+		}
+
 		signatures = append(signatures, Sig{
 			Method: typeName,
-			Detail: "Type",
+			Detail: makeTypeDetail(typeName),
 		})
 	}
 
