@@ -176,12 +176,12 @@ func makeTypeDetail(typeName string) string {
 		"FloatArray":  "Array of floats - specialized array containing only Float elements",
 		"StringArray": "Array of strings - specialized array containing only String elements",
 
-		// Default types (used when type cannot be inferred)
-		"DefaultInt":     "Default integer - fallback type when Int inference fails",
-		"DefaultFloat":   "Default float - fallback type when Float inference fails",
-		"DefaultString":  "Default string - fallback type when String inference fails",
-		"DefaultBlock":   "Default block - fallback type when Block inference fails",
-		"DefaultUntyped": "Default untyped - fallback when no type can be inferred",
+		// Default types (types with default values)
+		"DefaultInt":     "Integer with default value - parameter that has a default Int value",
+		"DefaultFloat":   "Float with default value - parameter that has a default Float value",
+		"DefaultString":  "String with default value - parameter that has a default String value",
+		"DefaultBlock":   "Block with default value - parameter that has a default Block value",
+		"DefaultUntyped": "Untyped with default value - parameter that has a default value",
 
 		// Block and functional types
 		"Block":            "Block type - represents a code block/lambda",
