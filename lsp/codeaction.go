@@ -295,7 +295,7 @@ func getRubyTiPath() string {
 			continue
 		}
 
-		path, ok := strings.CutPrefix(line, "RUBY_TI_PATH=")
+		path, ok := strings.CutPrefix(line, "RUBY_TI_PROJECT_PATH=")
 		if ok {
 			path = strings.TrimSpace(path)
 
