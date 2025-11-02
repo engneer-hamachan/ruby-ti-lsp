@@ -215,60 +215,123 @@ func makeTypeDetail(typeName string) string {
 	return typeName
 }
 
-func makeTypeDocumentation(typeName string) string {
-	typeDocs := map[string]string{
+func getTypeDescription(typeName string) string {
+	typeDescriptions := map[string]string{
 		// Basic types
-		"Int":    "Represents whole numbers.\n\nExamples: 42, -10, 0",
-		"Float":  "Represents decimal numbers.\n\nExamples: 3.14, -0.5, 2.0",
-		"String": "Represents text values.\n\nExamples: \"hello\", 'world'",
-		"Bool":   "Represents boolean values.\n\nExamples: true, false",
-		"Nil":    "Represents absence of value.\n\nExample: nil",
-		"Symbol": "Represents immutable identifiers.\n\nExamples: :name, :status, :active",
+		"Int":    "Represents whole numbers.",
+		"Float":  "Represents decimal numbers.",
+		"String": "Represents text values.",
+		"Bool":   "Represents boolean values.",
+		"Nil":    "Represents absence of value.",
+		"Symbol": "Represents immutable identifiers.",
 
 		// Container types
-		"Array":       "Ordered collection of elements.\n\nExamples:\n[1, 2, 3]\n['a', 'b', 'c']",
-		"Hash":        "Key-value pairs mapping.\n\nExample:\n{name: 'Alice', age: 30}",
-		"IntArray":    "Array containing only integers.\n\nExample:\n[1, 2, 3, 4, 5]",
-		"FloatArray":  "Array containing only floats.\n\nExample:\n[1.5, 2.7, 3.14]",
-		"StringArray": "Array containing only strings.\n\nExample:\n['foo', 'bar', 'baz']",
+		"Array":       "Ordered collection of elements.",
+		"Hash":        "Key-value pairs mapping.",
+		"IntArray":    "Array containing only integers.",
+		"FloatArray":  "Array containing only floats.",
+		"StringArray": "Array containing only strings.",
 
 		// Default types (types with default values)
-		"DefaultInt":     "Parameter with default integer value.\n\nExample:\ndef foo(x: 1)\n  # x has default value 1\nend",
-		"DefaultFloat":   "Parameter with default float value.\n\nExample:\ndef foo(x: 1.5)\n  # x has default value 1.5\nend",
-		"DefaultString":  "Parameter with default string value.\n\nExample:\ndef foo(name: \"default\")\n  # name has default value \"default\"\nend",
-		"DefaultBlock":   "Parameter with default block value.\n\nExample:\ndef foo(block: ->{puts 1})\n  # block has default lambda\nend",
-		"DefaultUntyped": "Parameter with default value of any type.\n\nExample:\ndef foo(x: some_value)\n  # x has default value\nend",
+		"DefaultInt":     "Parameter with default integer value.",
+		"DefaultFloat":   "Parameter with default float value.",
+		"DefaultString":  "Parameter with default string value.",
+		"DefaultBlock":   "Parameter with default block value.",
+		"DefaultUntyped": "Parameter with default value of any type.",
 
 		// Block and functional types
-		"Block":            "Code block or lambda.\n\nExamples:\n{|x| x * 2}\n->(x) { x + 1 }",
-		"BlockResultArray": "Array of elements returned by block execution.\n\nExample:\n[1,2,3].map{|x| x*2}\n#=> [2,4,6]",
-		"KeyValueArray":    "Array created from hash entries.\n\nExample:\n{a: 1, b: 2}.to_a\n#=> [[:a, 1], [:b, 2]]",
-		"KeyArray":         "Array containing hash keys.\n\nExample:\n{a: 1, b: 2}.keys\n#=> [:a, :b]",
+		"Block":            "Code block or lambda.",
+		"BlockResultArray": "Array of elements returned by block execution.",
+		"KeyValueArray":    "Array created from hash entries.",
+		"KeyArray":         "Array containing hash keys.",
 
 		// Special type system types
-		"Untyped":             "Value without type constraints.\n\nAllows any operation without type checking.",
-		"Unify":               "Merges type variants into single unified type.\n\nCombines Union<Int, String> variants into unified type.",
-		"OptionalUnify":       "Unified type that may also be nil.\n\nUnifies variants and adds Nil as a possible type.",
-		"SelfConvertArray":    "Converts receiver to array of its type variants.\n\nReceiver object is converted into array containing its variants.",
-		"SelfArgument":        "Variable return type based on argument count.\n\n0 args: returns Nil\n1 arg: returns the value\n2+ args: returns Array",
-		"UnifiedSelfArgument": "Unified version of SelfArgument type.\n\nCombined type from self argument variants.",
-		"Flatten":             "Flattens nested array structures.\n\nExample:\n[[1,2],[3,4]].flatten\n#=> [1,2,3,4]",
+		"Untyped":             "Value without type constraints. Allows any operation without type checking.",
+		"Unify":               "Merges type variants into single unified type.",
+		"OptionalUnify":       "Unified type that may also be nil. Unifies variants and adds Nil as a possible type.",
+		"SelfConvertArray":    "Converts receiver to array of its type variants.",
+		"SelfArgument":        "Variable return type based on argument count (0 args: Nil, 1 arg: value, 2+ args: Array).",
+		"UnifiedSelfArgument": "Unified version of SelfArgument type.",
+		"Flatten":             "Flattens nested array structures.",
 
 		// Union and special
-		"Number":  "Union of Int and Float types.\n\nExamples:\n42 (Int)\n3.14 (Float)",
-		"Union":   "Represents multiple possible types.\n\nExample:\nString | Int | Nil",
-		"Self":    "Refers to the receiver object's own type.\n\nReturns the type of the object itself.",
-		"Range":   "Represents a sequence of values.\n\nExamples:\n1..10\n'a'..'z'",
-		"Keyword": "Named parameter in method definition.\n\nExample:\ndef foo(name:, age:)\n  # name and age are keyword arguments\nend",
+		"Number":  "Union of Int and Float types.",
+		"Union":   "Represents multiple possible types.",
+		"Self":    "Refers to the receiver object's own type.",
+		"Range":   "Represents a sequence of values.",
+		"Keyword": "Named parameter in method definition.",
 
 		// Test/other
-		"IntInt": "Union type used for testing.\n\nInt | Int",
+		"IntInt": "Union type used for testing (Int | Int).",
 	}
 
-	if doc, ok := typeDocs[typeName]; ok {
-		return doc
+	if desc, ok := typeDescriptions[typeName]; ok {
+		return desc
 	}
 	return ""
+}
+
+func getTypeCodeExample(typeName string) string {
+	typeExamples := map[string]string{
+		// Basic types
+		"Int":    "42\n-10\n0",
+		"Float":  "3.14\n-0.5\n2.0",
+		"String": "\"hello\"\n'world'",
+		"Bool":   "true\nfalse",
+		"Nil":    "nil",
+		"Symbol": ":name\n:status\n:active",
+
+		// Container types
+		"Array":       "[1, 2, 3]\n['a', 'b', 'c']",
+		"Hash":        "{name: 'Alice', age: 30}",
+		"IntArray":    "[1, 2, 3, 4, 5]",
+		"FloatArray":  "[1.5, 2.7, 3.14]",
+		"StringArray": "['foo', 'bar', 'baz']",
+
+		// Default types (types with default values)
+		"DefaultInt":     "def foo(x: 1)\n  # x has default value 1\nend",
+		"DefaultFloat":   "def foo(x: 1.5)\n  # x has default value 1.5\nend",
+		"DefaultString":  "def foo(name: \"default\")\n  # name has default value\nend",
+		"DefaultBlock":   "def foo(block: ->{puts 1})\n  # block has default lambda\nend",
+		"DefaultUntyped": "def foo(x: some_value)\n  # x has default value\nend",
+
+		// Block and functional types
+		"Block":            "{|x| x * 2}\n->(x) { x + 1 }",
+		"BlockResultArray": "[1,2,3].map{|x| x*2}\n#=> [2,4,6]",
+		"KeyValueArray":    "{a: 1, b: 2}.to_a\n#=> [[:a, 1], [:b, 2]]",
+		"KeyArray":         "{a: 1, b: 2}.keys\n#=> [:a, :b]",
+
+		// Special type system types
+		"Flatten": "[[1,2],[3,4]].flatten\n#=> [1,2,3,4]",
+
+		// Union and special
+		"Number":  "42      # Int\n3.14    # Float",
+		"Union":   "String | Int | Nil",
+		"Range":   "1..10\n'a'..'z'",
+		"Keyword": "def foo(name:, age:)\n  # keyword arguments\nend",
+	}
+
+	if example, ok := typeExamples[typeName]; ok {
+		return example
+	}
+	return ""
+}
+
+func makeTypeDocumentation(typeName string) string {
+	desc := getTypeDescription(typeName)
+	example := getTypeCodeExample(typeName)
+
+	if desc == "" {
+		return ""
+	}
+
+	doc := "```text\n" + desc + "\n```"
+
+	if example != "" {
+		doc += "\n\n**Example:**\n```ruby\n" + example + "\n```"
+	}
+
+	return doc
 }
 
 func findJsonTypeCompletion(content string, line uint32, character uint32) []Sig {

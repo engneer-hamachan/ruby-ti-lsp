@@ -154,9 +154,14 @@ func textDocumentCompletion(
 
 	for _, sig := range signatures {
 		item := protocol.CompletionItem{
-			Label:         sig.Method,
-			Detail:        &sig.Detail,
-			Documentation: sig.Documentation,
+			Label:  sig.Method,
+			Detail: &sig.Detail,
+		}
+		if sig.Documentation != "" {
+			item.Documentation = protocol.MarkupContent{
+				Kind:  protocol.MarkupKindMarkdown,
+				Value: sig.Documentation,
+			}
 		}
 
 		items = append(items, item)
