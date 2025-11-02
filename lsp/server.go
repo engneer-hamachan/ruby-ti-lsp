@@ -153,11 +153,13 @@ func textDocumentCompletion(
 	}
 
 	for _, sig := range signatures {
-		items =
-			append(items, protocol.CompletionItem{
-				Label:  sig.Method,
-				Detail: &sig.Detail,
-			})
+		item := protocol.CompletionItem{
+			Label:         sig.Method,
+			Detail:        &sig.Detail,
+			Documentation: sig.Documentation,
+		}
+
+		items = append(items, item)
 	}
 
 	return items, nil

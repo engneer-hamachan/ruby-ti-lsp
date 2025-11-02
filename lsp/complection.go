@@ -160,59 +160,115 @@ func isInTypeArray(content string, line uint32, character uint32) bool {
 }
 
 func makeTypeDetail(typeName string) string {
-	typeDescriptions := map[string]string{
+	typeDetails := map[string]string{
 		// Basic types
-		"Int":    "Integer type - represents whole numbers",
-		"Float":  "Float type - represents decimal numbers",
-		"String": "String type - represents text",
-		"Bool":   "Boolean type - true or false",
-		"Nil":    "Nil type - represents absence of value",
-		"Symbol": "Symbol type - immutable identifier",
+		"Int":    "Integer type",
+		"Float":  "Float type",
+		"String": "String type",
+		"Bool":   "Boolean type",
+		"Nil":    "Nil type",
+		"Symbol": "Symbol type",
 
 		// Container types
-		"Array":       "Array type - collection of elements",
-		"Hash":        "Hash type - key-value mapping",
-		"IntArray":    "Array of integers - specialized array containing only Int elements",
-		"FloatArray":  "Array of floats - specialized array containing only Float elements",
-		"StringArray": "Array of strings - specialized array containing only String elements",
+		"Array":       "Array type",
+		"Hash":        "Hash type",
+		"IntArray":    "Array of integers",
+		"FloatArray":  "Array of floats",
+		"StringArray": "Array of strings",
 
 		// Default types (types with default values)
-		"DefaultInt":     "Integer with default value - parameter that has a default Int value",
-		"DefaultFloat":   "Float with default value - parameter that has a default Float value",
-		"DefaultString":  "String with default value - parameter that has a default String value",
-		"DefaultBlock":   "Block with default value - parameter that has a default Block value",
-		"DefaultUntyped": "Untyped with default value - parameter that has a default value",
+		"DefaultInt":     "Integer with default value",
+		"DefaultFloat":   "Float with default value",
+		"DefaultString":  "String with default value",
+		"DefaultBlock":   "Block with default value",
+		"DefaultUntyped": "Untyped with default value",
 
 		// Block and functional types
-		"Block":            "Block type - represents a code block/lambda",
-		"BlockResultArray": "Array of block results - array containing elements returned by block execution",
-		"KeyValueArray":    "Array of key-value pairs - array created from hash entries",
-		"KeyArray":         "Array of keys - array containing hash keys",
+		"Block":            "Block type",
+		"BlockResultArray": "Array of block results",
+		"KeyValueArray":    "Array of key-value pairs",
+		"KeyArray":         "Array of hash keys",
 
 		// Special type system types
-		"Untyped":             "Untyped - represents values without type constraints",
-		"Unify":               "Unify variants - combines multiple type variants into one unified type",
-		"OptionalUnify":       "Optional unify - unifies variants and adds Nil as possible type",
-		"SelfConvertArray":    "Self converted to array - converts receiver object into array of its variants",
-		"SelfArgument":        "Self argument - returns Nil, single arg, or array based on argument count",
-		"UnifiedSelfArgument": "Unified self argument - unified version of self argument type",
-		"Flatten":             "Flatten - flattens nested structures into single level",
+		"Untyped":             "Untyped",
+		"Unify":               "Unify variants",
+		"OptionalUnify":       "Optional unify",
+		"SelfConvertArray":    "Self converted to array",
+		"SelfArgument":        "Self argument",
+		"UnifiedSelfArgument": "Unified self argument",
+		"Flatten":             "Flatten",
 
 		// Union and special
-		"Number":  "Number type - union of Int and Float",
-		"Union":   "Union type - represents multiple possible types",
-		"Self":    "Self type - refers to the receiver objects type",
-		"Range":   "Range type - represents a range of values",
-		"Keyword": "Keyword argument - named parameter in method call",
+		"Number":  "Number type (Int or Float)",
+		"Union":   "Union type",
+		"Self":    "Self type",
+		"Range":   "Range type",
+		"Keyword": "Keyword argument",
 
 		// Test/other
-		"IntInt": "Int or Int union - used for testing union types",
+		"IntInt": "Int or Int union",
 	}
 
-	if desc, ok := typeDescriptions[typeName]; ok {
-		return desc
+	if detail, ok := typeDetails[typeName]; ok {
+		return detail
 	}
 	return typeName
+}
+
+func makeTypeDocumentation(typeName string) string {
+	typeDocs := map[string]string{
+		// Basic types
+		"Int":    "Represents whole numbers.\n\nExamples: 42, -10, 0",
+		"Float":  "Represents decimal numbers.\n\nExamples: 3.14, -0.5, 2.0",
+		"String": "Represents text values.\n\nExamples: \"hello\", 'world'",
+		"Bool":   "Represents boolean values.\n\nExamples: true, false",
+		"Nil":    "Represents absence of value.\n\nExample: nil",
+		"Symbol": "Represents immutable identifiers.\n\nExamples: :name, :status, :active",
+
+		// Container types
+		"Array":       "Ordered collection of elements.\n\nExamples:\n[1, 2, 3]\n['a', 'b', 'c']",
+		"Hash":        "Key-value pairs mapping.\n\nExample:\n{name: 'Alice', age: 30}",
+		"IntArray":    "Array containing only integers.\n\nExample:\n[1, 2, 3, 4, 5]",
+		"FloatArray":  "Array containing only floats.\n\nExample:\n[1.5, 2.7, 3.14]",
+		"StringArray": "Array containing only strings.\n\nExample:\n['foo', 'bar', 'baz']",
+
+		// Default types (types with default values)
+		"DefaultInt":     "Parameter with default integer value.\n\nExample:\ndef foo(x: 1)\n  # x has default value 1\nend",
+		"DefaultFloat":   "Parameter with default float value.\n\nExample:\ndef foo(x: 1.5)\n  # x has default value 1.5\nend",
+		"DefaultString":  "Parameter with default string value.\n\nExample:\ndef foo(name: \"default\")\n  # name has default value \"default\"\nend",
+		"DefaultBlock":   "Parameter with default block value.\n\nExample:\ndef foo(block: ->{puts 1})\n  # block has default lambda\nend",
+		"DefaultUntyped": "Parameter with default value of any type.\n\nExample:\ndef foo(x: some_value)\n  # x has default value\nend",
+
+		// Block and functional types
+		"Block":            "Code block or lambda.\n\nExamples:\n{|x| x * 2}\n->(x) { x + 1 }",
+		"BlockResultArray": "Array of elements returned by block execution.\n\nExample:\n[1,2,3].map{|x| x*2}\n#=> [2,4,6]",
+		"KeyValueArray":    "Array created from hash entries.\n\nExample:\n{a: 1, b: 2}.to_a\n#=> [[:a, 1], [:b, 2]]",
+		"KeyArray":         "Array containing hash keys.\n\nExample:\n{a: 1, b: 2}.keys\n#=> [:a, :b]",
+
+		// Special type system types
+		"Untyped":             "Value without type constraints.\n\nAllows any operation without type checking.",
+		"Unify":               "Merges type variants into single unified type.\n\nCombines Union<Int, String> variants into unified type.",
+		"OptionalUnify":       "Unified type that may also be nil.\n\nUnifies variants and adds Nil as a possible type.",
+		"SelfConvertArray":    "Converts receiver to array of its type variants.\n\nReceiver object is converted into array containing its variants.",
+		"SelfArgument":        "Variable return type based on argument count.\n\n0 args: returns Nil\n1 arg: returns the value\n2+ args: returns Array",
+		"UnifiedSelfArgument": "Unified version of SelfArgument type.\n\nCombined type from self argument variants.",
+		"Flatten":             "Flattens nested array structures.\n\nExample:\n[[1,2],[3,4]].flatten\n#=> [1,2,3,4]",
+
+		// Union and special
+		"Number":  "Union of Int and Float types.\n\nExamples:\n42 (Int)\n3.14 (Float)",
+		"Union":   "Represents multiple possible types.\n\nExample:\nString | Int | Nil",
+		"Self":    "Refers to the receiver object's own type.\n\nReturns the type of the object itself.",
+		"Range":   "Represents a sequence of values.\n\nExamples:\n1..10\n'a'..'z'",
+		"Keyword": "Named parameter in method definition.\n\nExample:\ndef foo(name:, age:)\n  # name and age are keyword arguments\nend",
+
+		// Test/other
+		"IntInt": "Union type used for testing.\n\nInt | Int",
+	}
+
+	if doc, ok := typeDocs[typeName]; ok {
+		return doc
+	}
+	return ""
 }
 
 func findJsonTypeCompletion(content string, line uint32, character uint32) []Sig {
@@ -228,8 +284,9 @@ func findJsonTypeCompletion(content string, line uint32, character uint32) []Sig
 		}
 
 		signatures = append(signatures, Sig{
-			Method: typeName,
-			Detail: makeTypeDetail(typeName),
+			Method:        typeName,
+			Detail:        makeTypeDetail(typeName),
+			Documentation: makeTypeDocumentation(typeName),
 		})
 	}
 
