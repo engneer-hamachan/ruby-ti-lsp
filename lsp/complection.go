@@ -325,10 +325,10 @@ func makeTypeDocumentation(typeName string) string {
 		return ""
 	}
 
-	doc := "```text\n" + desc + "\n```"
+	doc := "```text\n" + desc + "\n```\n```text\n```\n\n"
 
 	if example != "" {
-		doc += "\n\n**Example:**\n```ruby\n" + example + "\n```"
+		doc += "\n**Example:**\n```ruby\n" + example + "\n```"
 	}
 
 	return doc
