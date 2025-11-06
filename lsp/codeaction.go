@@ -234,7 +234,7 @@ func getExtendsClasses(uri protocol.DocumentUri, className string) []string {
 	}
 	tmpFile.Close()
 
-	cmd := exec.Command("ti", tmpFile.Name(), "--extends", className)
+	cmd := exec.Command("ti", tmpFile.Name(), "--extends", "--class="+className)
 	output, err := cmd.Output()
 	if err != nil {
 		return []string{}
