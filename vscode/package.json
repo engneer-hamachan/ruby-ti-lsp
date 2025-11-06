@@ -12,7 +12,8 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "onLanguage:ruby"
+    "onLanguage:ruby",
+    "onLanguage:json"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -21,6 +22,12 @@
         "id": "ruby",
         "extensions": [
           ".rb"
+        ]
+      },
+      {
+        "id": "json",
+        "extensions": [
+          ".json"
         ]
       }
     ],

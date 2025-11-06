@@ -24,9 +24,12 @@ export function activate(context: ExtensionContext) {
   };
 
   const clientOptions: LanguageClientOptions = {
-    documentSelector: [{ scheme: 'file', language: 'ruby' }],
+    documentSelector: [
+      { scheme: 'file', language: 'ruby' },
+      { scheme: 'file', language: 'json' }
+    ],
     synchronize: {
-      fileEvents: workspace.createFileSystemWatcher('**/*.rb')
+      fileEvents: workspace.createFileSystemWatcher('**/*.{rb,json}')
     }
   };
 
