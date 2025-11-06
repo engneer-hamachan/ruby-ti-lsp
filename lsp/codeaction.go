@@ -259,15 +259,18 @@ func createMethodCodeActionForClass(
 ) *protocol.CodeAction {
 
 	var title string
-	if targetClass == errorInfo.ClassName {
+
+	switch targetClass {
+	case errorInfo.ClassName:
 		title = fmt.Sprintf(
 			"Add method '%s' to class '%s'",
 			errorInfo.MethodName,
 			targetClass,
 		)
-	} else {
+
+	default:
 		title = fmt.Sprintf(
-			"Add method '%s' to parent class '%s'",
+			"Add method '%s' to extends class '%s'",
 			errorInfo.MethodName,
 			targetClass,
 		)
