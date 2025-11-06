@@ -82,6 +82,14 @@ func textDocumentCodeAction(
 			if action != nil {
 				codeActions = append(codeActions, *action)
 			}
+
+			extendsClasses := getExtendsClasses(params.TextDocument.URI, errorInfo.ClassName)
+			for _, parentClass := range extendsClasses {
+				action := createMethodCodeActionForClass(errorInfo, diagnostic, parentClass)
+				if action != nil {
+					codeActions = append(codeActions, *action)
+				}
+			}
 		}
 	}
 
@@ -201,17 +209,69 @@ func createClassCodeAction(
 	}
 }
 
-func createMethodCodeAction(
+func getDocumentContent(uri protocol.DocumentUri) string {
+	content, ok := documentContents[string(uri)]
+	if !ok {
+		return ""
+	}
+	return content
+}
+
+func getExtendsClasses(uri protocol.DocumentUri, className string) []string {
+	documentContent := getDocumentContent(uri)
+	if documentContent == "" {
+		return []string{}
+	}
+
+	tmpFile, err := os.CreateTemp("", "ruby-ti-lsp-*.rb")
+	if err != nil {
+		return []string{}
+	}
+	defer os.Remove(tmpFile.Name())
+
+	if _, err := tmpFile.WriteString(documentContent); err != nil {
+		return []string{}
+	}
+	tmpFile.Close()
+
+	cmd := exec.Command("ti", tmpFile.Name(), "--extends", className)
+	output, err := cmd.Output()
+	if err != nil {
+		return []string{}
+	}
+
+	var extendsClasses []string
+	lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line != "" && line != className {
+			extendsClasses = append(extendsClasses, line)
+		}
+	}
+
+	return extendsClasses
+}
+
+func createMethodCodeActionForClass(
 	errorInfo *ErrorInfo,
 	diagnostic protocol.Diagnostic,
+	targetClass string,
 ) *protocol.CodeAction {
 
-	title :=
-		fmt.Sprintf(
+	var title string
+	if targetClass == errorInfo.ClassName {
+		title = fmt.Sprintf(
 			"Add method '%s' to class '%s'",
 			errorInfo.MethodName,
-			errorInfo.ClassName,
+			targetClass,
 		)
+	} else {
+		title = fmt.Sprintf(
+			"Add method '%s' to parent class '%s'",
+			errorInfo.MethodName,
+			targetClass,
+		)
+	}
 
 	configDir := findBuiltinConfigDir()
 	if configDir == "" {
@@ -219,7 +279,7 @@ func createMethodCodeAction(
 	}
 
 	filePath :=
-		filepath.Join(configDir, strings.ToLower(errorInfo.ClassName)+".json")
+		filepath.Join(configDir, strings.ToLower(targetClass)+".json")
 
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		return nil
@@ -284,6 +344,13 @@ func createMethodCodeAction(
 		Diagnostics: []protocol.Diagnostic{diagnostic},
 		Edit:        &edit,
 	}
+}
+
+func createMethodCodeAction(
+	errorInfo *ErrorInfo,
+	diagnostic protocol.Diagnostic,
+) *protocol.CodeAction {
+	return createMethodCodeActionForClass(errorInfo, diagnostic, errorInfo.ClassName)
 }
 
 func getRubyTiPath() string {
