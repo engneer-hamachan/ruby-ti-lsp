@@ -1,15 +1,13 @@
-import * as path from 'path';
-import { workspace, ExtensionContext, window } from 'vscode';
+import { workspace, window } from 'vscode';
 import {
   LanguageClient,
   LanguageClientOptions,
-  ServerOptions,
-  TransportKind
+  ServerOptions
 } from 'vscode-languageclient/node';
 
 let client: LanguageClient;
 
-export function activate(context: ExtensionContext) {
+export function activate() {
   const config = workspace.getConfiguration('rubyTiLsp');
   const serverPath = config.get<string>('serverPath', 'ti-lsp');
 
