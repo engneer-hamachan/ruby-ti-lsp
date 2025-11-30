@@ -28,11 +28,6 @@ This project is currently in **beta** stage. Please do not use it in production 
 git clone https://github.com/engneer-hamachan/ruby-ti-lsp
 cd ruby-ti-lsp
 
-# Configure Ruby-TI path
-cp .env.example .env
-# Edit .env and set RUBY_TI_PROJECT_PATH to your Ruby-TI project directory
-# Example: RUBY_TI_PROJECT_PATH=/home/user/ruby-ti
-
 # This will build the `ti-lsp` binary and install it to `./bin/ti-lsp`.
 make install
 ```

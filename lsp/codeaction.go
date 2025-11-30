@@ -379,12 +379,12 @@ func getRubyTiPath() string {
 }
 
 func findBuiltinConfigDir() string {
-	rubyTiPath := getRubyTiPath()
-	if rubyTiPath == "" {
+	cwd, err := os.Getwd()
+	if err != nil {
 		return ""
 	}
 
-	configDir := filepath.Join(rubyTiPath, "builtin", "builtin_config")
+	configDir := filepath.Join(cwd, ".ti-config")
 	if stat, err := os.Stat(configDir); err == nil && stat.IsDir() {
 		return configDir
 	}
@@ -398,40 +398,4 @@ func findBuiltinJsonPath(configDir string, className string) string {
 		return jsonPath
 	}
 	return ""
-}
-
-func checkAndRunMakeInstall(uri protocol.DocumentUri) {
-	filePath := strings.TrimPrefix(string(uri), "file://")
-
-	if !strings.HasSuffix(filePath, ".json") {
-		return
-	}
-
-	configDir := findBuiltinConfigDir()
-	if configDir == "" {
-		return
-	}
-
-	absFilePath, err := filepath.Abs(filePath)
-	if err != nil {
-		return
-	}
-
-	absConfigDir, err := filepath.Abs(configDir)
-	if err != nil {
-		return
-	}
-
-	if !strings.HasPrefix(absFilePath, absConfigDir) {
-		return
-	}
-
-	rubyTiPath := getRubyTiPath()
-	if rubyTiPath == "" {
-		return
-	}
-
-	cmd := exec.Command("make", "install")
-	cmd.Dir = rubyTiPath
-	cmd.Run()
 }

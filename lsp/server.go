@@ -127,8 +127,6 @@ func textDocumentDidSave(
 
 	go publishDiagnostics(ctx, params.TextDocument.URI, content)
 
-	go checkAndRunMakeInstall(params.TextDocument.URI)
-
 	return nil
 }
 
