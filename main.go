@@ -8,9 +8,6 @@ import (
 	"ruby-ti-lsp/lsp"
 )
 
-//go:embed .env
-var envContent string
-
 func main() {
 	if _, err := exec.LookPath("ti"); err != nil {
 		fmt.Println("Error: 'ti' command not found in PATH")
@@ -20,6 +17,5 @@ func main() {
 	}
 
 	server := lsp.NewServer()
-	lsp.SetEnvContent(envContent)
 	server.RunStdio()
 }

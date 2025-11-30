@@ -13,12 +13,6 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-var envContent string
-
-func SetEnvContent(content string) {
-	envContent = content
-}
-
 type TiClassConfig struct {
 	Frame           string     `json:"frame"`
 	Class           string     `json:"class"`
@@ -354,28 +348,6 @@ func createMethodCodeAction(
 	diagnostic protocol.Diagnostic,
 ) *protocol.CodeAction {
 	return createMethodCodeActionForClass(errorInfo, diagnostic, errorInfo.ClassName)
-}
-
-func getRubyTiPath() string {
-	lines := strings.SplitSeq(envContent, "\n")
-
-	for line := range lines {
-		line = strings.TrimSpace(line)
-		if line == "" || strings.HasPrefix(line, "#") {
-			continue
-		}
-
-		path, ok := strings.CutPrefix(line, "RUBY_TI_PROJECT_PATH=")
-		if ok {
-			path = strings.TrimSpace(path)
-
-			path = strings.Trim(path, "\"'")
-			if path != "" {
-				return path
-			}
-		}
-	}
-	return ""
 }
 
 func findBuiltinConfigDir() string {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"slices"
 	"strings"
 	"time"
@@ -202,7 +203,10 @@ func findDefinition(
 
 			targetURI := params.TextDocument.URI
 			if !strings.Contains(defFilename, "ruby-ti-lsp-") {
-				targetURI = protocol.DocumentUri("file://" + defFilename)
+				originalFilePath := strings.TrimPrefix(string(params.TextDocument.URI), "file://")
+				baseDir := filepath.Dir(originalFilePath)
+				absolutePath := filepath.Join(baseDir, defFilename)
+				targetURI = protocol.DocumentUri("file://" + absolutePath)
 			}
 
 			location := protocol.Location{
