@@ -203,9 +203,11 @@ func findDefinition(
 
 			targetURI := params.TextDocument.URI
 			if !strings.Contains(defFilename, "ruby-ti-lsp-") {
-				originalFilePath := strings.TrimPrefix(string(params.TextDocument.URI), "file://")
-				baseDir := filepath.Dir(originalFilePath)
-				absolutePath := filepath.Join(baseDir, defFilename)
+				workingDir, err := os.Getwd()
+				if err != nil {
+					workingDir = "."
+				}
+				absolutePath := filepath.Join(workingDir, defFilename)
 				targetURI = protocol.DocumentUri("file://" + absolutePath)
 			}
 
