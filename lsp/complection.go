@@ -190,13 +190,13 @@ func makeTypeDetail(typeName string) string {
 		"KeyArray":         "Array of hash keys",
 
 		// Special type system types
-		"Untyped":             "Untyped",
-		"Unify":               "Unify variants",
-		"OptionalUnify":       "Optional unify",
-		"SelfConvertArray":    "Self converted to array",
-		"SelfArgument":        "Self argument",
-		"UnifiedSelfArgument": "Unified self argument",
-		"Flatten":             "Flatten",
+		"Untyped":       "Untyped",
+		"Unify":         "Unify variants",
+		"OptionalUnify": "Optional unify",
+		"SelfArray":     "Inner self type array",
+		"Argument":      "Direct return argumenti type",
+		"UnifyArgument": "Unified argument",
+		"Flatten":       "Flatten",
 
 		// Union and special
 		"Number":  "Number type (Int or Float)",
@@ -246,13 +246,13 @@ func getTypeDescription(typeName string) string {
 		"KeyArray":         "Array containing hash keys.",
 
 		// Special type system types
-		"Untyped":             "Value without type constraints. Allows any operation without type checking.",
-		"Unify":               "Merges type variants into single unified type.",
-		"OptionalUnify":       "Unified type that may also be nil. Unifies variants and adds Nil as a possible type.",
-		"SelfConvertArray":    "Converts receiver to array of its type variants.",
-		"SelfArgument":        "Variable return type based on argument count (0 args: Nil, 1 arg: value, 2+ args: Array).",
-		"UnifiedSelfArgument": "Unified version of SelfArgument type.",
-		"Flatten":             "Flattens nested array structures.",
+		"Untyped":       "Value without type constraints. Allows any operation without type checking.",
+		"Unify":         "Merges type variants into single unified type.",
+		"OptionalUnify": "Unified type that may also be nil. Unifies variants and adds Nil as a possible type.",
+		"SelfArray":     "Converts receiver to array of its type variants.",
+		"Argument":      "Variable return type based on argument count (0 args: Nil, 1 arg: value, 2+ args: Array).",
+		"UnifyArgument": "Unified version of Argument type.",
+		"Flatten":       "Flattens nested array structures.",
 
 		// Union and special
 		"Number":  "Union of Int and Float types.",
