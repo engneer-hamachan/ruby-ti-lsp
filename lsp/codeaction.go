@@ -14,11 +14,12 @@ import (
 )
 
 type TiClassConfig struct {
-	Frame           string     `json:"frame"`
-	Class           string     `json:"class"`
-	Extends         []string   `json:"extends"`
-	InstanceMethods []TiMethod `json:"instance_methods"`
-	ClassMethods    []TiMethod `json:"class_methods"`
+	Frame           string           `json:"frame"`
+	Class           string           `json:"class"`
+	Extends         []string         `json:"extends"`
+	InstanceMethods []TiMethod       `json:"instance_methods"`
+	ClassMethods    []TiMethod       `json:"class_methods"`
+	Constants       []TiConstantType `json:"constants"`
 }
 
 type TiMethod struct {
@@ -36,6 +37,11 @@ type TiReturnType struct {
 	Type          []string `json:"type"`
 	IsConditional bool     `json:"is_conditional,omitempty"`
 	IsDestructive bool     `json:"is_destructive,omitempty"`
+}
+
+type TiConstantType struct {
+	Name       string       `json:"name"`
+	ReturnType TiReturnType `json:"return_type"`
 }
 
 type ErrorInfo struct {
