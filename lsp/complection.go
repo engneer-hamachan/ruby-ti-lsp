@@ -41,18 +41,20 @@ func getSignatures(cmdOutput []byte) []Sig {
 		line := scanner.Text()
 
 		if sigLine, ok := strings.CutPrefix(line, "%"); ok {
-			parts := strings.SplitN(sigLine, ":::", 2)
-			if len(parts) < 2 {
+			parts := strings.SplitN(sigLine, ":::", 3)
+			if len(parts) < 3 {
 				continue
 			}
 			methodName := parts[0]
 			detail := parts[1]
+			document := parts[2]
 
 			if !methodSet[detail] {
 				methodSet[detail] = true
 				responseSignatures = append(responseSignatures, Sig{
-					Method: methodName,
-					Detail: detail,
+					Method:        methodName,
+					Detail:        detail,
+					Documentation: document,
 				})
 			}
 		}
