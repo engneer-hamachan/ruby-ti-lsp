@@ -27,6 +27,7 @@ type TiMethod struct {
 	Arguments       []TiArgument `json:"arguments"`
 	BlockParameters []string     `json:"block_parameters,omitempty"`
 	ReturnType      TiReturnType `json:"return_type"`
+	Document        string       `json:"document"`
 }
 
 type TiArgument struct {
