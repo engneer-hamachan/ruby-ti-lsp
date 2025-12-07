@@ -20,6 +20,7 @@ func NewServer() *server.Server {
 		TextDocumentDidChange:  textDocumentDidChange,
 		TextDocumentDidSave:    textDocumentDidSave,
 		TextDocumentDefinition: textDocumentDefinition,
+		TextDocumentHover:      textDocumentHover,
 		TextDocumentCodeLens:   textDocumentCodeLens,
 		TextDocumentCodeAction: textDocumentCodeAction,
 	}
@@ -45,6 +46,8 @@ func initialize(
 			".", "_",
 		},
 	}
+
+	capabilities.HoverProvider = true
 
 	capabilities.CodeLensProvider = &protocol.CodeLensOptions{
 		ResolveProvider: &[]bool{false}[0],
@@ -185,6 +188,21 @@ func textDocumentDefinition(
 	location, err := findDefinition(content, params)
 
 	return location, err
+}
+
+func textDocumentHover(
+	ctx *glsp.Context,
+	params *protocol.HoverParams,
+) (*protocol.Hover, error) {
+
+	content, ok := documentContents[params.TextDocument.URI]
+	if !ok {
+		return nil, nil
+	}
+
+	hover, err := findHover(content, params)
+
+	return hover, err
 }
 
 func publishDiagnostics(
