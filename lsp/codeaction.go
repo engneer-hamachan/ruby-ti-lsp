@@ -299,6 +299,10 @@ func createMethodCodeActionForClass(
 		return nil
 	}
 
+	if classConfig.Extends == nil {
+		classConfig.Extends = []string{}
+	}
+
 	newMethod := TiMethod{
 		Name: errorInfo.MethodName,
 		Arguments: []TiArgument{
