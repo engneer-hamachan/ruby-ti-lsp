@@ -43,6 +43,7 @@ func findHover(
 	if _, err := tmpFile.WriteString(modifiedContent); err != nil {
 		return nil, nil
 	}
+
 	tmpFile.Close()
 
 	hoverInfo := getTiOutForHover(tmpFile.Name(), int(params.Position.Line)+1)
@@ -61,15 +62,20 @@ func findHover(
 	return hover, nil
 }
 
-// getTiOutForHover gets hover information by running ti --hover --row=<row>
 func getTiOutForHover(filename string, row int) string {
-
 	ctx, cancel :=
 		context.WithTimeout(context.Background(), 1000*time.Millisecond)
+
 	defer cancel()
 
 	cmd :=
-		exec.CommandContext(ctx, "ti", filename, "--hover", fmt.Sprintf("--row=%d", row))
+		exec.CommandContext(
+			ctx,
+			"ti",
+			filename,
+			"--hover",
+			fmt.Sprintf("--row=%d", row),
+		)
 
 	output, err := cmd.Output()
 	if err != nil {
@@ -79,47 +85,34 @@ func getTiOutForHover(filename string, row int) string {
 	return parseHoverOutput(output)
 }
 
-// parseHoverOutput parses ti --hover output and formats it as markdown
 func parseHoverOutput(cmdOutput []byte) string {
 	content := string(cmdOutput)
 	lines := strings.Split(content, "\n")
 
 	var markdownBuilder strings.Builder
 
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if line == "" {
-			continue
+	line := strings.TrimSpace(lines[0])
+
+	if sigLine, ok := strings.CutPrefix(line, "%"); ok {
+		parts := strings.SplitN(sigLine, ":::", 3)
+		if len(parts) < 2 {
+			return ""
 		}
 
-		// Parse lines starting with % (methodName:::signature:::documentation)
-		if sigLine, ok := strings.CutPrefix(line, "%"); ok {
-			parts := strings.SplitN(sigLine, ":::", 3)
-			if len(parts) < 2 {
-				continue
-			}
+		signature := parts[1]
+		documentation := ""
+		if len(parts) >= 3 {
+			documentation = parts[2]
+		}
 
-			signature := parts[1]
-			documentation := ""
-			if len(parts) >= 3 {
-				documentation = parts[2]
-			}
+		markdownBuilder.WriteString("```ruby\n")
+		markdownBuilder.WriteString(signature)
+		markdownBuilder.WriteString("\n```\n")
 
-			// Format as markdown with signature in code block
-			markdownBuilder.WriteString("```ruby\n")
-			markdownBuilder.WriteString(signature)
-			markdownBuilder.WriteString("\n```\n")
-
-			// Add documentation if available
-			if documentation != "" {
-				markdownBuilder.WriteString("\n---\n\n")
-				markdownBuilder.WriteString(documentation)
-			}
-
-			// Only show first match
-			break
+		if documentation != "" {
+			markdownBuilder.WriteString("\n---\n\n")
+			markdownBuilder.WriteString(documentation)
 		}
 	}
-
 	return strings.TrimSpace(markdownBuilder.String())
 }
