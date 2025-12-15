@@ -16,22 +16,6 @@ func findHover(
 	params *protocol.HoverParams,
 ) (*protocol.Hover, error) {
 
-	codeLines := strings.Split(content, "\n")
-	if int(params.Position.Line) >= len(codeLines) {
-		return nil, nil
-	}
-
-	currentLine := codeLines[params.Position.Line]
-
-	targetCode :=
-		extractTargetCode(currentLine, int(params.Position.Character))
-	if targetCode == "" {
-		return nil, nil
-	}
-
-	codeLines[params.Position.Line] = targetCode
-	modifiedContent := strings.Join(codeLines, "\n")
-
 	tmpFile, err := os.CreateTemp("", "ruby-ti-lsp-*.rb")
 	if err != nil {
 		return nil, nil
@@ -40,7 +24,7 @@ func findHover(
 	defer os.Remove(tmpFile.Name())
 	defer tmpFile.Close()
 
-	if _, err := tmpFile.WriteString(modifiedContent); err != nil {
+	if _, err := tmpFile.WriteString(content); err != nil {
 		return nil, nil
 	}
 
