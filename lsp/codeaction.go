@@ -31,7 +31,9 @@ type TiMethod struct {
 }
 
 type TiArgument struct {
-	Type []string `json:"type"`
+	Type       []string `json:"type"`
+	Key        string   `json:"key,omitempty"`
+	IsAsterisk bool     `json:"is_asterisk,omitempty"`
 }
 
 type TiReturnType struct {
