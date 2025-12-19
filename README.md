@@ -13,10 +13,6 @@ Ruby-TI LSP provides IDE features for Ruby code using the Ruby-TI type analyzer:
 
 ![Example](images/sample.png)
 
-## ⚠️ Beta Warning
-
-This project is currently in **beta** stage. Please do not use it in production environments. There may be bugs, incomplete features, or breaking changes in future releases.
-
 ## Requirements
 
 - Go 1.24.5 or later
