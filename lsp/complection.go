@@ -182,6 +182,7 @@ func makeTypeDetail(typeName string) string {
 		"DefaultInt":     "Integer with default value",
 		"DefaultFloat":   "Float with default value",
 		"DefaultString":  "String with default value",
+		"DefaultBool":    "Bool with default value",
 		"DefaultBlock":   "Block with default value",
 		"DefaultUntyped": "Untyped with default value",
 
@@ -238,6 +239,7 @@ func getTypeDescription(typeName string) string {
 		"DefaultInt":     "Parameter with default integer value.",
 		"DefaultFloat":   "Parameter with default float value.",
 		"DefaultString":  "Parameter with default string value.",
+		"DefaultBool":    "Parameter with default boolean value.",
 		"DefaultBlock":   "Parameter with default block value.",
 		"DefaultUntyped": "Parameter with default value of any type.",
 
@@ -294,6 +296,7 @@ func getTypeCodeExample(typeName string) string {
 		"DefaultInt":     "def foo(x: 1)\n  # x has default value 1\nend",
 		"DefaultFloat":   "def foo(x: 1.5)\n  # x has default value 1.5\nend",
 		"DefaultString":  "def foo(name: \"default\")\n  # name has default value\nend",
+		"DefaultBool":    "def foo(x: true)\n  # x has default value true\nend",
 		"DefaultBlock":   "def foo(block: ->{puts 1})\n  # block has default lambda\nend",
 		"DefaultUntyped": "def foo(x: some_value)\n  # x has default value\nend",
 
