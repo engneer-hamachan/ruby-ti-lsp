@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func removeTaiilDot(content string, line uint32, character uint32) string {
+func removeAfterLastDot(content string, line uint32, character uint32) string {
 	lines := strings.Split(content, "\n")
 	if int(line) < len(lines) {
 		currentLine := lines[line]
@@ -19,9 +19,8 @@ func removeTaiilDot(content string, line uint32, character uint32) string {
 			currentLine = currentLine[:character]
 		}
 
-		trimmed := strings.TrimSpace(currentLine)
-		if strings.HasSuffix(trimmed, ".") {
-			currentLine = strings.TrimSuffix(currentLine, ".")
+		if lastDotIdx := strings.LastIndex(currentLine, "."); lastDotIdx != -1 {
+			currentLine = currentLine[:lastDotIdx]
 		}
 
 		lines[line] = currentLine
@@ -64,7 +63,7 @@ func getSignatures(cmdOutput []byte) []Sig {
 }
 
 func findComplection(content string, line uint32, character uint32) []Sig {
-	content = removeTaiilDot(content, line, character)
+	content = removeAfterLastDot(content, line, character)
 
 	tmpFile, err := os.CreateTemp("", "ruby-ti-lsp-*.rb")
 	if err != nil {
