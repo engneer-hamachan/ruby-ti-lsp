@@ -163,12 +163,12 @@ func isInTypeArray(content string, line uint32, character uint32) bool {
 func makeTypeDetail(typeName string) string {
 	typeDetails := map[string]string{
 		// Basic types
-		"Int":    "Integer type",
-		"Float":  "Float type",
-		"String": "String type",
-		"Bool":   "Boolean type",
-		"Nil":    "Nil type",
-		"Symbol": "Symbol type",
+		"Int":      "Integer type",
+		"Float":    "Float type",
+		"String":   "String type",
+		"Bool":     "Boolean type",
+		"NilClass": "Nil type",
+		"Symbol":   "Symbol type",
 
 		// Container types
 		"Array":       "Array type",
@@ -220,12 +220,12 @@ func makeTypeDetail(typeName string) string {
 func getTypeDescription(typeName string) string {
 	typeDescriptions := map[string]string{
 		// Basic types
-		"Int":    "Represents whole numbers.",
-		"Float":  "Represents decimal numbers.",
-		"String": "Represents text values.",
-		"Bool":   "Represents boolean values.",
-		"Nil":    "Represents absence of value.",
-		"Symbol": "Represents immutable identifiers.",
+		"Int":      "Represents whole numbers.",
+		"Float":    "Represents decimal numbers.",
+		"String":   "Represents text values.",
+		"Bool":     "Represents boolean values.",
+		"NilClass": "Represents absence of value.",
+		"Symbol":   "Represents immutable identifiers.",
 
 		// Container types
 		"Array":       "Ordered collection of elements.",
@@ -251,9 +251,9 @@ func getTypeDescription(typeName string) string {
 		// Special type system types
 		"Untyped":       "Value without type constraints. Allows any operation without type checking.",
 		"Unify":         "Merges type variants into single unified type.",
-		"OptionalUnify": "Unified type that may also be nil. Unifies variants and adds Nil as a possible type.",
+		"OptionalUnify": "Unified type that may also be nil. Unifies variants and adds NilClass as a possible type.",
 		"SelfArray":     "Converts receiver to array of its type variants.",
-		"Argument":      "Variable return type based on argument count (0 args: Nil, 1 arg: value, 2+ args: Array).",
+		"Argument":      "Variable return type based on argument count (0 args: NilClass, 1 arg: value, 2+ args: Array).",
 		"UnifyArgument": "Unified version of Argument type.",
 		"Flatten":       "Flattens nested array structures.",
 
@@ -277,12 +277,12 @@ func getTypeDescription(typeName string) string {
 func getTypeCodeExample(typeName string) string {
 	typeExamples := map[string]string{
 		// Basic types
-		"Int":    "42\n-10\n0",
-		"Float":  "3.14\n-0.5\n2.0",
-		"String": "\"hello\"\n'world'",
-		"Bool":   "true\nfalse",
-		"Nil":    "nil",
-		"Symbol": ":name\n:status\n:active",
+		"Int":      "42\n-10\n0",
+		"Float":    "3.14\n-0.5\n2.0",
+		"String":   "\"hello\"\n'world'",
+		"Bool":     "true\nfalse",
+		"NilClass": "nil",
+		"Symbol":   ":name\n:status\n:active",
 
 		// Container types
 		"Array":       "[1, 2, 3]\n['a', 'b', 'c']",
@@ -310,7 +310,7 @@ func getTypeCodeExample(typeName string) string {
 
 		// Union and special
 		"Number":  "42      # Int\n3.14    # Float",
-		"Union":   "String | Int | Nil",
+		"Union":   "String | Int | NilClass",
 		"Range":   "1..10\n'a'..'z'",
 		"Keyword": "def foo(name:, age:)\n  # keyword arguments\nend",
 	}
