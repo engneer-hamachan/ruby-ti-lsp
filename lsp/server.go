@@ -2,6 +2,7 @@ package lsp
 
 import (
 	"encoding/json"
+	"os"
 	"strings"
 
 	"github.com/tliron/glsp"
@@ -29,10 +30,22 @@ func NewServer() *server.Server {
 	return server
 }
 
+func isConfigExists() bool {
+	if _, err := os.Stat(".ti-config"); os.IsNotExist(err) {
+		return false
+	}
+
+	return true
+}
+
 func initialize(
 	ctx *glsp.Context,
 	params *protocol.InitializeParams,
 ) (any, error) {
+
+	if !isConfigExists() {
+		return protocol.InitializeResult{}, nil
+	}
 
 	capabilities := handler.CreateServerCapabilities()
 
