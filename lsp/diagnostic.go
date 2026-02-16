@@ -5,6 +5,7 @@ import (
 	"context"
 	"os"
 	"os/exec"
+	"ruby-ti-lsp/cmd"
 	"strconv"
 	"strings"
 	"time"
@@ -31,9 +32,14 @@ func runDiagnostics(content string) []protocol.Diagnostic {
 		context.WithTimeout(context.Background(), 1000*time.Millisecond)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "ti", tmpFile.Name())
+	args := []string{tmpFile.Name()}
+	if cmd.IsStrictMode {
+		args = append(args, "--strict")
+	}
 
-	output, _ := cmd.Output()
+	tiCmd := exec.CommandContext(ctx, "ti", args...)
+
+	output, _ := tiCmd.Output()
 
 	return parseErrorsFromTiOutput(string(output))
 }

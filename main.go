@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"ruby-ti-lsp/cmd"
 	"ruby-ti-lsp/lsp"
 )
 
@@ -15,6 +16,8 @@ func main() {
 		fmt.Println("Please install Ruby-TI: https://github.com/engneer-hamachan/ruby-ti")
 		os.Exit(1)
 	}
+
+	cmd.ParseFlags()
 
 	server := lsp.NewServer()
 	server.RunStdio()
