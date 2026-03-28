@@ -31,7 +31,8 @@ func removeAfterLastDot(content string, line uint32, character uint32) string {
 }
 
 func getSignatures(cmdOutput []byte) []Sig {
-	methodSet := make(map[string]bool)
+	detailSet := make(map[string]bool)
+	methodIndex := make(map[string]int)
 	scanner := bufio.NewScanner(strings.NewReader(string(cmdOutput)))
 
 	var responseSignatures []Sig
@@ -44,18 +45,37 @@ func getSignatures(cmdOutput []byte) []Sig {
 			if len(parts) < 3 {
 				continue
 			}
+
 			methodName := parts[0]
 			detail := parts[1]
 			document := parts[2]
 
-			if !methodSet[detail] {
-				methodSet[detail] = true
-				responseSignatures = append(responseSignatures, Sig{
-					Method:        methodName,
-					Detail:        detail,
-					Documentation: document,
-				})
+			if detailSet[detail] {
+				continue
 			}
+
+			detailSet[detail] = true
+
+			idx, exists := methodIndex[methodName]
+
+			if exists {
+				responseSignatures[idx].Overloads =
+					append(responseSignatures[idx].Overloads, detail)
+
+				continue
+			}
+
+			methodIndex[methodName] = len(responseSignatures)
+
+			responseSignatures =
+				append(
+					responseSignatures,
+					Sig{
+						Method:        methodName,
+						Detail:        detail,
+						Documentation: document,
+					},
+				)
 		}
 	}
 

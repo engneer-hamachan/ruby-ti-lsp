@@ -5,6 +5,7 @@ type Sig struct {
 	Method        string
 	Detail        string
 	Documentation string
+	Overloads     []string
 	Frame         string
 	Class         string
 	IsStatic      bool

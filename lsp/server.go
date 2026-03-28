@@ -171,10 +171,23 @@ func textDocumentCompletion(
 			Label:  sig.Method,
 			Detail: &sig.Detail,
 		}
+
+		var doc string
+		if len(sig.Overloads) > 0 {
+			doc += "```ruby\n" + strings.Join(sig.Overloads, "\n") + "\n```"
+		}
+
 		if sig.Documentation != "" {
+			if doc != "" {
+				doc += "\n\n---\n"
+			}
+			doc += sig.Documentation
+		}
+
+		if doc != "" {
 			item.Documentation = protocol.MarkupContent{
 				Kind:  protocol.MarkupKindMarkdown,
-				Value: sig.Documentation,
+				Value: doc,
 			}
 		}
 
