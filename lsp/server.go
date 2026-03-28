@@ -167,27 +167,20 @@ func textDocumentCompletion(
 	}
 
 	for _, sig := range signatures {
-		item := protocol.CompletionItem{
-			Label:  sig.Method,
-			Detail: &sig.Detail,
+		detail := sig.Detail
+		if len(sig.Overloads) > 0 {
+			detail += " | " + strings.Join(sig.Overloads, " | ")
 		}
 
-		var doc string
-		if len(sig.Overloads) > 0 {
-			doc += "```ruby\n" + strings.Join(sig.Overloads, "\n") + "\n```"
+		item := protocol.CompletionItem{
+			Label:  sig.Method,
+			Detail: &detail,
 		}
 
 		if sig.Documentation != "" {
-			if doc != "" {
-				doc += "\n\n---\n"
-			}
-			doc += sig.Documentation
-		}
-
-		if doc != "" {
 			item.Documentation = protocol.MarkupContent{
 				Kind:  protocol.MarkupKindMarkdown,
-				Value: doc,
+				Value: sig.Documentation,
 			}
 		}
 
