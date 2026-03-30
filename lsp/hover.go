@@ -73,30 +73,43 @@ func parseHoverOutput(cmdOutput []byte) string {
 	content := string(cmdOutput)
 	lines := strings.Split(content, "\n")
 
-	var markdownBuilder strings.Builder
+	var signatures []string
+	documentation := ""
 
-	line := strings.TrimSpace(lines[0])
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
 
-	if sigLine, ok := strings.CutPrefix(line, "%"); ok {
+		sigLine, ok := strings.CutPrefix(line, "%")
+		if !ok {
+			continue
+		}
+
 		parts := strings.SplitN(sigLine, ":::", 3)
 		if len(parts) < 2 {
-			return ""
+			continue
 		}
 
-		signature := parts[1]
-		documentation := ""
-		if len(parts) >= 3 {
+		signatures = append(signatures, parts[1])
+
+		if documentation == "" && len(parts) >= 3 {
 			documentation = parts[2]
 		}
-
-		markdownBuilder.WriteString("```ruby\n")
-		markdownBuilder.WriteString(signature)
-		markdownBuilder.WriteString("\n```\n")
-
-		if documentation != "" {
-			markdownBuilder.WriteString("\n---\n\n")
-			markdownBuilder.WriteString(documentation)
-		}
 	}
+
+	if len(signatures) == 0 {
+		return ""
+	}
+
+	var markdownBuilder strings.Builder
+
+	markdownBuilder.WriteString("```ruby\n")
+	markdownBuilder.WriteString(strings.Join(signatures, "\n"))
+	markdownBuilder.WriteString("\n```\n")
+
+	if documentation != "" {
+		markdownBuilder.WriteString("\n---\n\n")
+		markdownBuilder.WriteString(documentation)
+	}
+
 	return strings.TrimSpace(markdownBuilder.String())
 }
