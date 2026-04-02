@@ -92,7 +92,7 @@ func parseHoverOutput(cmdOutput []byte) string {
 		signatures = append(signatures, parts[1])
 
 		if documentation == "" && len(parts) >= 3 {
-			documentation = parts[2]
+			documentation = strings.ReplaceAll(parts[2], "<CR>", "\n")
 		}
 	}
 

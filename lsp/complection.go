@@ -48,7 +48,7 @@ func getSignatures(cmdOutput []byte) []Sig {
 
 			methodName := parts[0]
 			detail := parts[1]
-			document := parts[2]
+			document := strings.ReplaceAll(parts[2], "<CR>", "\n")
 
 			if detailSet[detail] {
 				continue
