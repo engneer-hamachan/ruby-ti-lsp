@@ -77,7 +77,7 @@ func getDefineInfos(content string) ([]DefineInfo, error) {
 		if err != nil {
 			continue
 		}
-		if info != nil {
+		if info != nil && info.FileName == tmpFile.Name() {
 			infos = append(infos, *info)
 		}
 	}
